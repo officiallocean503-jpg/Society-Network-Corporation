@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Network Society Control Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        :root {
+            --bg: #050816;
+            --bg-alt: #0b1120;
+            --panel: #020617;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59, 130, 246, 0.15);
+            --accent-strong: #2563eb;
+            --text: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border: #111827;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f97316;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #111827 0, var(--bg) 40%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Layout */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #020617, #020617 40%, #030712);
+            border-right: 1px solid var(--border);
+            padding: 20px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 0.9rem;
+            background: radial-gradient(circle at 30% 30%, #4f46e5, #0ea5e9);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        .sidebar-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-button {
+            border: none;
+            outline: none;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+
+        .nav-button-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--border);
+        }
+
+        .nav-button span.badge {
+            font-size: 11px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 999px;
+        }
+
+        .nav-button.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.16), rgba(59, 130, 246, 0));
+            color: var(--text);
+        }
+
+        .nav-button.active .nav-dot {
+            background: var(--accent);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.75);
+        }
+
+        .nav-button:hover {
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sidebar-footer-strong {
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-height: 100vh;
+        }
+
+        .topbar {
+            height: 60px;
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(2, 6, 23, 0.88);
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .topbar-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pill {
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.8);
+            font-size: 12px;
+        }
+
+        .topbar-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 30%, #0ea5e9, #1d4ed8);
+            display: inline-block;
+        }
+
+        .content {
+            flex: 1;
+            padding: 16px 24px 20px 24px;
+            overflow-y: auto;
+        }
+
+        .grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
+        .card {
+            background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.95));
+            border-radius: 18px;
+            padding: 13px 14px 14px 14px;
+            border: 1px solid rgba(15, 23, 42, 0.9);
+            box-shadow:
+                0 18px 40px rgba(15, 23, 42, 0.75),
+                0 0 0 1px rgba(15, 23, 42, 1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+        }
+
+        .metric-value {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .metric-tag {
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(31, 41, 55, 0.9);
+        }
+
+        .metric-tag.success {
+            border-color: rgba(34, 197, 94, 0.4);
+            color: var(--success);
+        }
+
+        .metric-tag.warning {
+            border-color: rgba(249, 115, 22, 0.4);
+            color: var(--warning);
+        }
+
+        .metric-tag.danger {
+            border-color: rgba(239, 68, 68, 0.4);
+            color: var(--danger);
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: rgba(15, 23, 42, 0.88);
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.16s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+            border-color: rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.5);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.05);
+        }
+
+        .btn-ghost {
+            background: transparent;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .btn-danger {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: var(--danger);
+        }
+
+        .badge-pill {
+            padding: 1px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            color: var(--text-muted);
+        }
+
+        .badge-pill.accent {
+            background: var(--accent-soft);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .section-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .table thead {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .table th,
+        .table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(31, 41, 55, 0.8);
+        }
+
+        .table th {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .table tr:hover td {
+            background: rgba(15, 23, 42, 0.75);
+        }
+
+        .pill-status {
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pill-status-open {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent);
+        }
+
+        .pill-status-closed {
+            background: rgba(55, 65, 81, 0.7);
+            color: var(--text-muted);
+        }
+
+        .pill-status-escalated {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .input {
+            border-radius: 999px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: rgba(15, 23, 42, 0.9);
+            padding: 6px 12px;
+            font-size: 12px;
+            color: var(--text);
+            outline: none;
+            min-width: 0;
+        }
+
+        .input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input.full {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .input-select {
+            border-radius: 999px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: rgba(15, 23, 42, 0.9);
+            padding: 6px 10px;
+            font-size: 12px;
+            color: var(--text);
+            outline: none;
+        }
+
+        .field-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+        }
+
+        .section-body {
+            margin-top: 8px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            color: var(--text-muted);
+        }
+
+        .tag.accent {
+            border-color: rgba(59, 130, 246, 0.6);
+            color: var(--accent);
+        }
+
+        .empty-state {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 10px 0;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @media (max-width: 880px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                overflow-x: auto;
+                padding: 10px 14px;
+                gap: 16px;
+            }
+            .brand {
+                min-width: 180px;
+            }
+            .main {
+                max-height: none;
+            }
+            .topbar {
+                padding: 0 14px;
+            }
+            .content {
+                padding: 12px 14px 16px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">NS</div>
+            <div class="brand-text">
+                <div class="brand-title">Network Society</div>
+                <div class="brand-subtitle">Moderation Suite</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="sidebar-section-title">Workspace</div>
+            <div class="nav-group">
+                <button class="nav-button active" data-section="overview">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        Overview
+                    </span>
+                    <span class="badge">Live</span>
+                </button>
+                <button class="nav-button" data-section="cases">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        Cases
+                    </span>
+                </button>
+                <button class="nav-button" data-section="user">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        User Lookup
+                    </span>
+                </button>
+                <button class="nav-button" data-section="tickets">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        Tickets
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <div class="sidebar-section-title">Integrations</div>
+            <div class="nav-group">
+                <button class="nav-button" data-section="roblox">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        Roblox Identity
+                    </span>
+                </button>
+                <button class="nav-button" data-section="logs">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        Event Logs
+                    </span>
+                </button>
+                <button class="nav-button" data-section="settings">
+                    <span class="nav-button-label">
+                        <span class="nav-dot"></span>
+                        Governance & Settings
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-strong">Network Society Foundation</div>
+            <div>Control plane for Discord governance, escalation and identity.</div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-title">Server Command Center</div>
+                <div class="topbar-subtitle">
+                    Unified view across moderation, tickets, Roblox identity, and network activity.
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="pill">
+                    <span class="pill-dot"></span> Bot Online
+                </div>
+                <div class="pill">Environment: Production</div>
+                <div class="topbar-user">
+                    <span class="topbar-avatar"></span>
+                    <span>Staff Console</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <!-- OVERVIEW -->
+            <section class="section active" id="section-overview">
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Active Risk Surface</div>
+                                <div class="card-subtitle">Members with recent cases</div>
+                            </div>
+                            <span class="badge-pill accent" id="overview-active-case-count">—</span>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="overview-open-risks">0</div>
+                            <div class="metric-tag warning">Monitoring</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Last 24h Actions</div>
+                                <div class="card-subtitle">Warnings / mutes / bans executed</div>
+                            </div>
+                            <span class="badge-pill" id="overview-24h-label">Live window</span>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="overview-24h-actions">0</div>
+                            <div class="metric-tag success">Stable</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Ticket Load</div>
+                                <div class="card-subtitle">Open tickets across all panels</div>
+                            </div>
+                            <span class="badge-pill" id="overview-ticket-panels">0 panels</span>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="overview-open-tickets">0</div>
+                            <div class="metric-tag">Awaiting sync</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height: 10px;"></div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Recent Cases</div>
+                                <div class="card-subtitle">Last 10 moderation events</div>
+                            </div>
+                            <button class="btn btn-ghost" data-section-jump="cases">
+                                Open Cases View
+                            </button>
+                        </div>
+                        <table class="table" id="overview-cases-table">
+                            <thead>
+                                <tr>
+                                    <th>Case</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Points</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data wired via JS/API later -->
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            No data loaded yet. Wire this table to your API
+                                            (e.g. <code>GET /cases?limit=10</code>).
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Signals & Governance</div>
+                                <div class="card-subtitle">High-level configuration snapshot</div>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            <div class="field-label">Moderation controls</div>
+                            <div class="tag-list">
+                                <span class="tag accent">Points & escalation engine</span>
+                                <span class="tag">Notes + case history</span>
+                                <span class="tag">Anti-ping enforcement</span>
+                                <span class="tag">Channel & server logs</span>
+                                <span class="tag">Roblox identity binding</span>
+                                <span class="tag">Tickets v2 (panel-based)</span>
+                            </div>
+
+                            <div style="height: 10px;"></div>
+
+                            <div class="field-label">Next iteration ideas</div>
+                            <div class="tag-list">
+                                <span class="tag">Web-triggered actions</span>
+                                <span class="tag">Escalation templates</span>
+                                <span class="tag">Per-panel SLAs</span>
+                                <span class="tag">Audit-ready exports</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CASES -->
+            <section class="section" id="section-cases">
+                <div class="section-actions">
+                    <span class="badge-pill">Source: bot storage / DB</span>
+                    <button class="btn btn-ghost" id="btn-refresh-cases">Refresh</button>
+                    <button class="btn btn-primary">Export view</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="section-title">Cases & Governance Log</div>
+                            <div class="section-subtitle">
+                                Filter by user, type, or reason. Mirrors <code>!history</code>, <code>!case</code>, and <code>!searchcases</code>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-body">
+                        <div class="input-row">
+                            <input class="input" id="cases-user-filter" placeholder="Filter by user ID / tag" />
+                            <input class="input" id="cases-type-filter" placeholder="Type (warn / mute / ban / note / ...)" />
+                            <input class="input" id="cases-keyword-filter" placeholder="Keyword in reason / note" />
+                            <button class="btn btn-ghost" id="btn-apply-case-filters">Apply filters</button>
+                        </div>
+
+                        <table class="table" id="cases-table">
+                            <thead>
+                                <tr>
+                                    <th>Case</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Points</th>
+                                    <th>Moderator</th>
+                                    <th>Timestamp</th>
+                                    <th>Reason / Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Later: populate via API -->
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            This grid is ready to be wired to your API, e.g.
+                                            <code>GET /guilds/{guild_id}/cases</code>.<br />
+                                            Use JavaScript <code>fetch()</code> to hydrate this table.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- USER LOOKUP -->
+            <section class="section" id="section-user">
+                <div class="section-actions">
+                    <button class="btn btn-ghost">Reset view</button>
+                    <button class="btn btn-primary">Push to staff channel</button>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-title">User Intelligence</div>
+                                <div class="section-subtitle">
+                                    Mirrors <code>!fullinfo</code> and <code>!selfinfo</code> flows.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-body">
+                            <div class="field-label">Lookup parameters</div>
+                            <div class="input-row">
+                                <input class="input" id="user-discord-id" placeholder="Discord ID (recommended)" />
+                                <input class="input" id="user-discord-tag" placeholder="Fallback: username#0000" />
+                                <button class="btn btn-ghost" id="btn-user-lookup">Run lookup</button>
+                            </div>
+
+                            <div class="field-label">Roblox anchor (optional)</div>
+                            <div class="input-row">
+                                <input class="input" id="user-roblox-username" placeholder="Roblox username" />
+                                <button class="btn btn-ghost" id="btn-user-roblox-lookup">Resolve link</button>
+                            </div>
+
+                            <div style="height: 8px;"></div>
+                            <div class="field-label">Lookup guidance</div>
+                            <div class="tag-list">
+                                <span class="tag">Consolidate moderation + identity</span>
+                                <span class="tag">Use ID for deterministic lookups</span>
+                                <span class="tag">Treat notes as internal-only</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Resolved Profile Snapshot</div>
+                                <div class="card-subtitle">Data returned from your backend.</div>
+                            </div>
+                        </div>
+                        <div class="section-body" id="user-profile-panel">
+                            <div class="empty-state">
+                                Once wired to an API, this panel should show:
+                                <ul>
+                                    <li>Discord account metadata (created, joined, roles)</li>
+                                    <li>Moderation summary (cases, points, latest actions)</li>
+                                    <li>Roblox linkage and verification method</li>
+                                    <li>Any active tickets / risk indicators</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TICKETS -->
+            <section class="section" id="section-tickets">
+                <div class="section-actions">
+                    <button class="btn btn-ghost" id="btn-refresh-tickets">Refresh</button>
+                    <button class="btn btn-primary">Open ticket hub</button>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-title">Ticket Panels</div>
+                                <div class="section-subtitle">
+                                    Mirrors <code>!addticketpanel</code>, <code>!ticketpanels</code>, and <code>!ticket</code> orchestration.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-body">
+                            <div class="field-label">Panel catalogue (from bot config)</div>
+                            <table class="table" id="ticket-panels-table">
+                                <thead>
+                                    <tr>
+                                        <th>Key</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="empty-state">
+                                                Wire this to <code>GET /guilds/{guild_id}/ticket-panels</code> from your backend.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div style="height: 8px;"></div>
+                            <div class="field-label">Governance recommendations</div>
+                            <div class="tag-list">
+                                <span class="tag accent">Support</span>
+                                <span class="tag accent">Appeals</span>
+                                <span class="tag accent">Reports / Safety</span>
+                                <span class="tag">Bug reports</span>
+                                <span class="tag">Partnerships / business</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Open Ticket Inventory</div>
+                                <div class="card-subtitle">
+                                    Active tickets across panels for this guild.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            <table class="table" id="tickets-table">
+                                <thead>
+                                    <tr>
+                                        <th>Channel</th>
+                                        <th>Panel</th>
+                                        <th>Owner</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                Wire to <code>GET /guilds/{guild_id}/tickets</code>. This should map 1:1 with your
+                                                Discord ticket channels.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ROBLOX -->
+            <section class="section" id="section-roblox">
+                <div class="section-actions">
+                    <button class="btn btn-ghost">Download mapping CSV</button>
+                    <button class="btn btn-primary">Re-run integrity check</button>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-title">Roblox Identity Fabric</div>
+                                <div class="section-subtitle">
+                                    Mirrors <code>!verify</code>, <code>!verifydone</code>, <code>!whois</code>, <code>!rlookup</code>.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            <div class="field-label">Lookup by Discord ID</div>
+                            <div class="input-row">
+                                <input class="input" id="roblox-discord-id" placeholder="Discord ID" />
+                                <button class="btn btn-ghost">Resolve</button>
+                            </div>
+
+                            <div class="field-label">Lookup by Roblox username</div>
+                            <div class="input-row">
+                                <input class="input" id="roblox-username" placeholder="Roblox username" />
+                                <button class="btn btn-ghost">Resolve</button>
+                            </div>
+
+                            <div style="height: 8px;"></div>
+
+                            <div class="field-label">Verification standard</div>
+                            <div class="tag-list">
+                                <span class="tag accent">Profile description code</span>
+                                <span class="tag">Deterministic user mapping</span>
+                                <span class="tag">Staff-visible audit trail</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Mapping Overview</div>
+                                <div class="card-subtitle">High-level linkage metrics.</div>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            <div class="grid grid-3">
+                                <div>
+                                    <div class="field-label">Linked members</div>
+                                    <div class="metric-value" id="roblox-linked-count">0</div>
+                                    <div class="card-subtitle">Users with verified Roblox accounts</div>
+                                </div>
+                                <div>
+                                    <div class="field-label">Integrity checks</div>
+                                    <div class="metric-value" id="roblox-integrity-score">100%</div>
+                                    <div class="card-subtitle">Matching username / mapping health</div>
+                                </div>
+                                <div>
+                                    <div class="field-label">Last sync</div>
+                                    <div class="metric-value" id="roblox-last-sync">—</div>
+                                    <div class="card-subtitle">Based on your backend timestamps</div>
+                                </div>
+                            </div>
+
+                            <div style="height: 10px;"></div>
+
+                            <div class="empty-state">
+                                Use this area to surface anomalies (e.g., deleted Roblox accounts, mismatched codes),
+                                once your backend provides that signal.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section class="section" id="section-settings">
+                <div class="section-actions">
+                    <button class="btn btn-ghost">Reload configuration</button>
+                    <button class="btn btn-primary">Push changes via bot</button>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="section-title">Server Governance Profile</div>
+                                <div class="section-subtitle">
+                                    Mirrors <code>!modroles</code>, <code>!protectedroles</code>, <code>!logchannels</code>.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            <div class="field-label">Moderator roles</div>
+                            <ul id="settings-modroles" style="list-style: none; padding-left: 0; font-size: 12px;">
+                                <li class="empty-state">
+                                    Populate this list from <code>/guilds/{guild_id}/settings</code> or similar endpoint.
+                                </li>
+                            </ul>
+
+                            <div class="field-label">Protected roles (anti-ping)</div>
+                            <ul id="settings-protectedroles" style="list-style: none; padding-left: 0; font-size: 12px;">
+                                <li class="empty-state">
+                                    These should align with your <code>!addprotectedrole</code> configuration.
+                                </li>
+                            </ul>
+
+                            <div class="field-label">Log channels</div>
+                            <ul id="settings-logchannels" style="list-style: none; padding-left: 0; font-size: 12px;">
+                                <li>Moderation log: <code>#(not loaded)</code></li>
+                                <li>Server log: <code>#(not loaded)</code></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Escalation Engine</div>
+                                <div class="card-subtitle">
+                                    Mirrors your points model and thresholds inside the bot.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            <div class="field-label">Point model (example from your bot)</div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Warn</td><td>1</td></tr>
+                                    <tr><td>Mute</td><td>2</td></tr>
+                                    <tr><td>Kick</td><td>3</td></tr>
+                                    <tr><td>Ban</td><td>4</td></tr>
+                                    <tr><td>Anti-ping trigger</td><td>1</td></tr>
+                                </tbody>
+                            </table>
+
+                            <div class="field-label">Thresholds (example)</div>
+                            <ul style="font-size: 12px; margin-top: 4px;">
+                                <li><strong>Mute:</strong> ≥ 3 points</li>
+                                <li><strong>Kick:</strong> ≥ 5 points</li>
+                                <li><strong>Ban:</strong> ≥ 7 points</li>
+                            </ul>
+
+                            <div class="empty-state" style="margin-top: 8px;">
+                                You can expose these threshold values from your backend so this page always reflects the live policy.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOGS -->
+            <section class="section" id="section-logs">
+                <div class="section-actions">
+                    <button class="btn btn-ghost">Last 1 hour</button>
+                    <button class="btn btn-ghost">Last 24 hours</button>
+                    <button class="btn btn-primary">Export audit trail</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="section-title">Event Stream</div>
+                            <div class="section-subtitle">
+                                Mirrors <code>!lastactions</code> plus server join/leave, message edits, deletes, ticket lifecycle.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <table class="table" id="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>Actor</th>
+                                    <th>Context</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-state">
+                                            Ideally backed by a dedicated endpoint such as <code>GET /guilds/{guild_id}/events</code>,
+                                            aggregating moderation + server logs into one consistent stream.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // ----------------------------
+        // Simple section switching
+        // ----------------------------
+        const navButtons = document.querySelectorAll(".nav-button");
+        const sections = document.querySelectorAll(".section");
+
+        function activateSection(sectionId) {
+            sections.forEach(sec => {
+                if (sec.id === "section-" + sectionId) {
+                    sec.classList.add("active");
+                } else {
+                    sec.classList.remove("active");
+                }
+            });
+
+            navButtons.forEach(btn => {
+                if (btn.dataset.section === sectionId) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            });
+        }
+
+        navButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const sectionId = btn.dataset.section;
+                if (sectionId) {
+                    activateSection(sectionId);
+                }
+            });
+        });
+
+        // Jump buttons from inside cards
+        document.querySelectorAll("[data-section-jump]").forEach(el => {
+            el.addEventListener("click", () => {
+                const target = el.getAttribute("data-section-jump");
+                if (target) {
+                    activateSection(target);
+                }
+            });
+        });
+
+        // ----------------------------
+        // Placeholder for API wiring
+        // ----------------------------
+        // Example: you can replace these with real fetch calls to your backend.
+        const mockStats = {
+            activeCaseMembers: 0,
+            openRisks: 0,
+            actions24h: 0,
+            ticketPanels: 0,
+            openTickets: 0
+        };
+
+        function hydrateOverview(stats) {
+            document.getElementById("overview-active-case-count").textContent =
+                stats.activeCaseMembers + " members";
+            document.getElementById("overview-open-risks").textContent = stats.openRisks;
+            document.getElementById("overview-24h-actions").textContent = stats.actions24h;
+            document.getElementById("overview-ticket-panels").textContent =
+                stats.ticketPanels + " panels";
+            document.getElementById("overview-open-tickets").textContent = stats.openTickets;
+        }
+
+        // Initially hydrate with placeholder values
+        hydrateOverview(mockStats);
+
+        // Later you could do something like:
+        // fetch("https://your-api/guilds/123/overview")
+        //   .then(res => res.json())
+        //   .then(data => hydrateOverview(data));
+    </script>
+</body>
+</html>
